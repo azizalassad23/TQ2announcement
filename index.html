@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CEK Nilai TQ2 CIT</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0c10;
+            --text-color: #e0e6ed;
+            --cyber-yellow: #fce205; /* Dibuat sedikit lebih terang untuk tombol */
+            --cyber-cyan: #00f0ff;
+            --cyber-pink: #ff003c;
+            --cyber-green: #39ff14;
+            --panel-bg: rgba(20, 22, 28, 0.85);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            /* Pola Grid Cyberpunk */
+            background-image: 
+                linear-gradient(rgba(0, 240, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 240, 255, 0.05) 1px, transparent 1px);
+            background-size: 30px 30px;
+            color: var(--text-color);
+            font-family: 'Rajdhani', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Efek Garis TV Jadul (Scanlines) */
+        body::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        .container {
+            background: var(--panel-bg);
+            border-top: 3px solid var(--cyber-yellow);
+            border-bottom: 3px solid var(--cyber-cyan);
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            position: relative;
+            z-index: 10;
+            backdrop-filter: blur(5px);
+            /* Potongan sudut ala Cyberpunk */
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 25px), calc(100% - 25px) 100%, 0 100%);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* Elemen Dekoratif UI */
+        .container::after {
+            content: 'SYS.REQ. // V.2.0.7.7';
+            position: absolute;
+            bottom: 5px;
+            right: 30px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.6rem;
+            color: var(--cyber-cyan);
+            opacity: 0.6;
+        }
+
+        h1 {
+            color: var(--cyber-yellow);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 2.2rem;
+            text-shadow: 2px 2px 0px var(--cyber-pink), -2px -2px 0px var(--cyber-cyan);
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        input {
+            background-color: rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--cyber-cyan);
+            border-left: 4px solid var(--cyber-cyan);
+            color: var(--text-color);
+            padding: 15px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1rem;
+            outline: none;
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            border-color: var(--cyber-yellow);
+            border-left-color: var(--cyber-pink);
+            background-color: rgba(252, 226, 5, 0.05);
+        }
+
+        button {
+            background-color: var(--cyber-yellow);
+            color: #000;
+            border: none;
+            padding: 18px;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%);
+            transition: 0.2s;
+            position: relative;
+        }
+
+        button:hover {
+            background-color: var(--cyber-cyan);
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(2px);
+        }
+
+        .result-panel {
+            margin-top: 20px;
+            padding: 25px;
+            background-color: #050608;
+            border: 1px solid #333;
+            display: none;
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%);
+        }
+
+        .result-label {
+            color: var(--cyber-cyan);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .result-value {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--text-color);
+            text-align: center;
+            line-height: 1;
+            transition: all 0.5s ease;
+        }
+
+        /* Efek Loading Blinking */
+        .loading-blink {
+            animation: blinker 0.8s linear infinite;
+            color: var(--cyber-yellow);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.5rem;
+        }
+
+        @keyframes blinker {
+            50% { opacity: 0; }
+        }
+
+        /* =========================================
+           ANIMASI DRAMATIS SELEBRASI (LULUS >= 75)
+           ========================================= */
+        .celebration {
+            border-color: var(--cyber-green) !important;
+            box-shadow: 0 0 40px rgba(57, 255, 20, 0.3), inset 0 0 20px rgba(57, 255, 20, 0.1);
+        }
+        .celebration .result-panel {
+            border-color: var(--cyber-green);
+            background: rgba(57, 255, 20, 0.05);
+        }
+        .celebration .result-value { 
+            color: var(--cyber-green); 
+            text-shadow: 0 0 20px var(--cyber-green), 0 0 40px var(--cyber-green);
+            transform: scale(1.1);
+            animation: float-pulse 2s infinite ease-in-out;
+        }
+
+        @keyframes float-pulse {
+            0%, 100% { transform: scale(1.1) translateY(0); }
+            50% { transform: scale(1.15) translateY(-5px); text-shadow: 0 0 30px var(--cyber-green), 0 0 60px var(--cyber-green); }
+        }
+
+        /* =========================================
+           ANIMASI DRAMATIS GAGAL (TIDAK LULUS < 75)
+           ========================================= */
+        .failure {
+            animation: glitch-container 0.3s infinite;
+            border-color: var(--cyber-pink) !important;
+        }
+        .failure .result-panel {
+            background: rgba(255, 0, 60, 0.1);
+            border-color: var(--cyber-pink);
+        }
+        .failure .result-value { 
+            color: var(--text-color); 
+            text-shadow: 4px 0 var(--cyber-pink), -4px 0 var(--cyber-cyan);
+            animation: glitch-text 0.2s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-container {
+            0% { transform: translate(0); box-shadow: 0 0 20px var(--cyber-pink); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); box-shadow: 0 0 40px var(--cyber-pink), inset 0 0 10px var(--cyber-pink); }
+        }
+
+        @keyframes glitch-text {
+            0% { clip-path: inset(10% 0 30% 0); transform: skew(-5deg); }
+            20% { clip-path: inset(80% 0 5% 0); transform: skew(5deg); }
+            40% { clip-path: inset(40% 0 40% 0); transform: skew(-5deg); }
+            60% { clip-path: inset(20% 0 60% 0); transform: skew(5deg); }
+            80% { clip-path: inset(60% 0 10% 0); transform: skew(-5deg); }
+            100% { clip-path: inset(0 0 90% 0); transform: skew(5deg); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container" id="mainContainer">
+        <h1>CEK NILAI</h1>
+        
+        <div class="input-group">
+            <input type="text" id="inputNama" placeholder="NAMA">
+            <input type="text" id="inputKelas" placeholder="KELAS">
+            <button onclick="mulaiDekripsi()">REVEAL THE GRADE</button>
+        </div>
+
+        <div class="result-panel" id="resultPanel">
+            <div class="result-label" id="labelNama">STATUS</div>
+            <div class="result-value" id="teksNilai">-</div>
+        </div>
+    </div>
+
+    <script>
+        // GANTI TAUTAN INI DENGAN TAUTAN CSV PUBLIK DARI GOOGLE SPREADSHEET ANDA
+        const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTnLOyAa38SVZJmIRCPwg4FvLbOojWuHbIHpcV_QjfIwMrwvluh8BTyZWzNGesXtkXHh9AHejYF7_fm/pub?gid=0&single=true&output=csv'; 
+
+        function mulaiDekripsi() {
+            const inputNama = document.getElementById('inputNama').value.toLowerCase().trim();
+            const inputKelas = document.getElementById('inputKelas').value.toLowerCase().trim();
+            const panel = document.getElementById('resultPanel');
+            const teksNilai = document.getElementById('teksNilai');
+            const labelNama = document.getElementById('labelNama');
+            const container = document.getElementById('mainContainer');
+
+            // Reset state
+            container.classList.remove('celebration', 'failure');
+            panel.style.display = 'block';
+
+            if (!inputNama || !inputKelas) {
+                teksNilai.innerHTML = '<span style="font-size: 1.5rem; color: var(--cyber-pink);">INPUT REQUIRED</span>';
+                labelNama.innerText = "SYSTEM ERROR";
+                return;
+            }
+
+            // Memulai efek dramatis suspense
+            labelNama.innerText = "DECRYPTING MAINFRAME...";
+            teksNilai.innerHTML = '<span class="loading-blink">_\\|/_</span>';
+
+            // Memberikan jeda waktu buatan 1.5 detik untuk membangun ketegangan
+            setTimeout(() => {
+                tarikDataSpreadsheet(inputNama, inputKelas, labelNama, teksNilai, container);
+            }, 1500);
+        }
+
+        async function tarikDataSpreadsheet(inputNama, inputKelas, labelNama, teksNilai, container) {
+            try {
+                const response = await fetch(sheetUrl);
+                const data = await response.text();
+                
+                const baris = data.split('\n');
+                let ditemukan = false;
+
+                for (let i = 1; i < baris.length; i++) {
+                    const kolom = baris[i].split(','); 
+                    
+                    if (kolom.length >= 3) {
+                        const namaSheet = kolom[0].toLowerCase().trim();
+                        const kelasSheet = kolom[1].toLowerCase().trim();
+                        const nilaiSheet = parseFloat(kolom[2].trim());
+
+                        if (namaSheet.includes(inputNama) && kelasSheet.includes(inputKelas)) {
+                            labelNama.innerText = `ACCESS GRANTED // ${kolom[0].toUpperCase()}`;
+                            teksNilai.innerText = nilaiSheet;
+                            
+                            // Trigger Animasi
+                            if (nilaiSheet >= 75) {
+                                container.classList.add('celebration');
+                            } else {
+                                container.classList.add('failure');
+                            }
+                            
+                            ditemukan = true;
+                            break; 
+                        }
+                    }
+                }
+
+                if (!ditemukan) {
+                    labelNama.innerText = "TARGET NOT FOUND";
+                    teksNilai.innerHTML = '<span style="font-size: 1.5rem; color: var(--cyber-pink);">NO DATA</span>';
+                }
+
+            } catch (error) {
+                labelNama.innerText = "NETWORK FAILURE";
+                teksNilai.innerHTML = '<span style="font-size: 1.5rem; color: var(--cyber-pink);">OFFLINE</span>';
+                console.error("Error fetching data: ", error);
+            }
+        }
+    </script>
+</body>
+</html>
